@@ -41,6 +41,7 @@ ENV PATH /opt/anaconda3/envs/lit-nlp/bin:$PATH
 ENV CONDA_PREFIX "/opt/anaconda3/envs/lit-nlp"
 ENV CONDA_SHLVL "1"
 ENV CONDA_DEFAULT_ENV "lit-nlp"
+ENV PIP_DEFAULT_TIMEOUT=10000
 
 # Build front-end with yarn
 WORKDIR lit_nlp/client
