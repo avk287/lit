@@ -7,6 +7,7 @@ https://www.tensorflow.org/datasets/catalog/glue
 Note that this requires the TensorFlow Datasets package, but the resulting LIT
 datasets just contain regular Python/NumPy data.
 """
+import pandas as pd
 from lit_nlp.api import dataset as lit_dataset
 from lit_nlp.api import types as lit_types
 
@@ -60,6 +61,7 @@ class SST2Data(lit_dataset.Dataset):
   def __init__(self, split: str):
     self._examples = []
     for ex in load_tfds('glue/sst2', split=split):
+      # print(ex['sentence'])
       self._examples.append({
           'sentence': ex['sentence'].decode('utf-8'),
           'label': self.LABELS[ex['label']],
@@ -268,5 +270,35 @@ class DiagnosticNLIData(lit_dataset.Dataset):
     return {
         'premise': lit_types.TextSegment(),
         'hypothesis': lit_types.TextSegment(),
+        'label': lit_types.CategoryLabel(vocab=self.LABELS)
+    }
+
+class DJDataset(lit_dataset.Dataset):
+  """Corpus of Linguistic Acceptability.
+
+  See
+  https://www.tensorflow.org/datasets/catalog/glue#gluecola_default_config.
+  """
+
+  # LABELS = [0,1,2]
+  # code_map_alter = {-1: 2, 1: 1, 0: 0}
+  LABELS = [0, 1]
+  code_map_alter = {-1: 0, 1: 1}
+  def __init__(self, split: str):
+    self._examples = []
+    data_df = pd.DataFrame()
+    if (split=="validation"):
+        # data_df = pd.read_csv("C:/Users/z004391h/OneDrive - Siemens Healthineers/SmartNLP/Projects/VisionLanguage/InformationExtraction/data/DJ/Cumulative/test_data_2014_1G.csv", sep=";")
+        data_df = pd.read_csv("/Users/ramyavunikili/DeJURE/Brazil/Data/v2/dataset_datalawyer_v2/5/Cumulative/test.csv",sep=";")
+
+    for ind, ex in data_df[:10].iterrows():
+      self._examples.append({
+          'sentence': ex['Content'],
+          'label': self.LABELS[self.code_map_alter[ex['Outcome']]],
+      })
+
+  def spec(self):
+    return {
+        'sentence': lit_types.TextSegment(),
         'label': lit_types.CategoryLabel(vocab=self.LABELS)
     }
